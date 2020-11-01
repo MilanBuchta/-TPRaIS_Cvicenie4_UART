@@ -40,6 +40,8 @@
 #include "MKL25Z4.h"
 #include "fsl_debug_console.h"
 #include "fsl_uart.h"
+#include "fsl_common.h"
+#include "fsl_lpsci.h"
 /* TODO: insert other include files here. */
 
 /* TODO: insert other definitions and declarations here. */
@@ -47,6 +49,14 @@
 /*
  * @brief   Application entry point.
  */
+
+extern "C" void UART0_IRQHandler(void) {
+	PRINTF("daskdhjsadhj");
+	LPSCI_ClearStatusFlags(UART0, kLPSCI_RxDataRegFullInterruptEnable);
+
+}
+
+
 int main(void) {
   	/* Init board hardware. */
     BOARD_InitBootPins();
@@ -57,22 +67,16 @@ int main(void) {
     BOARD_InitDebugConsole();
 #endif
     uint8_t ch;
-    uart_config_t config;
+    lpsci_config_t user_config;
 
-    UART_GetDefaultConfig(&config);
-    config.baudRate_Bps = 19200U;
-    config.enableRx = true;
-    config.enableTx = true;
+    LPSCI_GetDefaultConfig(&user_config);
+    user_config.baudRate_Bps = 19200U;
+    LPSCI_Init(UART0,&user_config,CLOCK_GetBusClkFreq());
+    LPSCI_EnableRx(UART0, true);
+    LPSCI_EnableInterrupts(UART0,kLPSCI_RxDataRegFullInterruptEnable);
 
-    //Nezozerie ti UART0 lebo to nie je toho typu
-    UART_Init(UART1, &config, CLOCK_GetBusClkFreq());
-
-
-    while (1)
+	  PRINTF("DSADSA");
+    while(1)
     {
-    	PRINTF("ZACIATOK");
-        UART_ReadBlocking(UART1, &ch, 1);
-        PRINTF("CHAR %c", ch);
     }
-    return 0 ;
 }
