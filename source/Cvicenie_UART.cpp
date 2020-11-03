@@ -42,6 +42,8 @@
 #include "fsl_uart.h"
 #include "fsl_common.h"
 #include "fsl_lpsci.h"
+
+
 /* TODO: insert other include files here. */
 
 /* TODO: insert other definitions and declarations here. */
@@ -50,10 +52,18 @@
  * @brief   Application entry point.
  */
 
-extern "C" void UART0_IRQHandler(void) {
-	PRINTF("daskdhjsadhj");
-	LPSCI_ClearStatusFlags(UART0, kLPSCI_RxDataRegFullInterruptEnable);
 
+
+
+extern "C" void UART0_IRQHandler(void) {
+    uint8_t data;
+
+    if ((kLPSCI_RxDataRegFullFlag)&LPSCI_GetStatusFlags(UART0))
+    {
+        data = LPSCI_ReadByte(UART0);
+
+        PRINTF("%x\n",data);
+    }
 }
 
 
@@ -73,9 +83,10 @@ int main(void) {
     user_config.baudRate_Bps = 19200U;
     LPSCI_Init(UART0,&user_config,CLOCK_GetBusClkFreq());
     LPSCI_EnableRx(UART0, true);
+    CLOCK_SetLpsci0Clock(0x1U);
     LPSCI_EnableInterrupts(UART0,kLPSCI_RxDataRegFullInterruptEnable);
-
-	  PRINTF("DSADSA");
+    EnableIRQ(UART0_IRQn);
+	  PRINTF("DSADSA \n");
     while(1)
     {
     }
